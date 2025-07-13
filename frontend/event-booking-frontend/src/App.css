@@ -1,0 +1,196 @@
+/* App.css */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+button.logout-btn {
+  background-color: #dc3545;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  float: right;
+}
+
+button.logout-btn:hover {
+  background-color: #c82333;
+}
+
+h1, h2 {
+  color: #343a40;
+  margin-bottom: 0.5rem;
+}
+
+ul.category-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul.category-list li {
+  background-color: #e9ecef;
+  padding: 0.4rem 0.8rem;
+  margin-bottom: 0.4rem;
+  border-radius: 5px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f6fc;
+  color: #2c3e50;
+}
+
+/* Kontener aplikacji */
+.app-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Wyloguj */
+.logout-btn {
+  background-color: #e74c3c;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Nagłówki */
+h1, h2, h3 {
+  color: #34495e;
+  margin-bottom: 0.8rem;
+}
+
+/* Formularze i przyciski */
+button {
+  border-radius: 8px;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Przycisk akcji */
+button.primary {
+  background-color: #2980b9;
+  color: white;
+}
+
+button.primary:hover:not(:disabled) {
+  background-color: #2471a3;
+}
+
+/* Checkboxy z lepszym gapem */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* Listy */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background-color: #ecf0f1;
+  margin-bottom: 0.6rem;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+li strong {
+  color: #2c3e50;
+}
+
+li button {
+  margin-left: 0.5rem;
+}
+
+/* Formularze w AdminSlots i Admin */
+form > label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+form select,
+form input[type="datetime-local"] {
+  padding: 0.5rem;
+  width: 100%;
+  border: 1px solid #bdc3c7;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-top: 0.3rem;
+}
+
+/* Layout sekcji */
+.section {
+  background-color: #fafafa;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* Przycisk anuluj */
+button.cancel {
+  background-color: #95a5a6;
+  color: white;
+}
+
+button.cancel:hover {
+  background-color: #7f8c8d;
+}
+
+/* Styl dla przycisków na liście */
+.slot-actions button {
+  background-color: #3498db;
+  color: white;
+}
+
+.slot-actions button:hover {
+  background-color: #2980b9;
+}
