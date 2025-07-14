@@ -7,11 +7,13 @@ from .views import (
     TimeSlotBookView,
     TimeSlotUnsubscribeView,
     TimeSlotViewSet,
+    UserViewSet
 )
 
 
 router = DefaultRouter()
 router.register(r'slots', TimeSlotViewSet, basename='timeslot')
+router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path('categories/', EventCategoryListView.as_view(), name='event_category_list'),

@@ -14,6 +14,16 @@ function getStartOfWeek(weekOffset = 0) {
   return monday;
 }
 
+const formatFullDate = (date) => {
+  const d = new Date(date);
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const weekday = d.toLocaleDateString('pl-PL', { weekday: 'long' });
+  const time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  return `${day}.${month} (${weekday}) ${time}`;
+};
+
 function groupSlotsByDay(slots, weekOffset) {
   const startOfWeek = getStartOfWeek(weekOffset);
   const days = [];
@@ -33,10 +43,9 @@ function groupSlotsByDay(slots, weekOffset) {
   return days;
 }
 
-function UserView() {
+function UserView({ categories }) {
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [slots, setSlots] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [weekOffset, setWeekOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
@@ -48,26 +57,16 @@ function UserView() {
       const decoded = jwtDecode(token);
       setUserId(decoded.user_id || decoded.sub);
       setUsername(decoded.username || decoded.name);
-      console.log(decoded);
     }
   }, []);
 
   useEffect(() => {
-    axios.get('/api/categories/')
-      .then(res => setCategories(res.data))
-      .catch(console.error);
-  }, []);
-  
-
-  useEffect(() => {
     fetchSlots();
-  }, [selectedCategory, weekOffset]);
+  }, [weekOffset]);
 
   const fetchSlots = () => {
     setLoading(true);
     let url = `/api/slots/?week=${weekOffset}`;
-    if (selectedCategory) url += `&category=${selectedCategory}`;
-
     axios.get(url)
       .then(res => {
         setSlots(res.data);
@@ -81,34 +80,31 @@ function UserView() {
 
   const handleBook = (id) => {
     axios.post(`/api/slots/${id}/book/`)
-      .then(() => fetchSlots())
+      .then(fetchSlots)
       .catch(console.error);
   };
 
   const handleUnsubscribe = (id) => {
     axios.post(`/api/slots/${id}/unsubscribe/`)
-      .then(() => fetchSlots())
+      .then(fetchSlots)
       .catch(console.error);
   };
 
-  if (loading) return <p>Ładowanie slotów...</p>;
-  
+  const isHighlighted = (categoryId) =>
+    selectedCategories.length === 0 || selectedCategories.includes(categoryId);
+
   const groupedDays = groupSlotsByDay(slots, weekOffset);
+
+  if (loading) return <p>Ładowanie slotów...</p>;
 
   return (
     <div>
-      <Preferences categories={categories} />
-      <h2>Twój kalendarz slotów</h2>
+      <Preferences
+        selectedIds={selectedCategories}
+        setSelectedIds={setSelectedCategories}
+      />
 
-      <label>
-        Filtruj po kategorii:&nbsp;
-        <select value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-          <option value="">Wszystkie</option>
-          {categories.map(cat => (
-            <option key={cat.id} value={cat.id}>{cat.name}</option>
-          ))}
-        </select>
-      </label>
+      <h2>Twój kalendarz slotów</h2>
 
       <div style={{ margin: '1rem 0' }}>
         <button onClick={() => setWeekOffset(weekOffset - 1)}>← Poprzedni tydzień</button>
@@ -118,15 +114,26 @@ function UserView() {
       {groupedDays.map(day => (
         <div key={day.date.toISOString()} style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '0.5rem', borderRadius: '8px' }}>
           <h3>{day.date.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
-          {day.slots.length === 0 ? <p>Brak slotów</p> : (
+          {day.slots.length === 0 ? (
+            <p>Brak slotów</p>
+          ) : (
             <ul>
-              {day.slots.map(slot => (
-                <li key={slot.id}>
-                  <strong>{slot.category.name}</strong> | {new Date(slot.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} – {new Date(slot.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                  <br />
-                  {(() => {
-                      console.log("Slot user:", slot.user, "| Current username:", username);
+              {day.slots.map(slot => {
+                let backgroundColor = ''; // domyślnie brak koloru
 
+                if (slot.user === username) {
+                  backgroundColor = '#4D8A4F'; // zielony (moje)
+                } else if (slot.user) {
+                  backgroundColor = '#E15759'; // czerwony (czyjeś)
+                } else if (isHighlighted(slot.category?.id || slot.category_id)) {
+                  backgroundColor = '#E6E753'; // niebookowane, zgodne z preferencją
+                }
+                const highlight = isHighlighted(slot.category?.id || slot.category_id);
+                return (
+                  <li key={slot.id} style={{ backgroundColor, padding: '0.5rem', borderRadius: '4px', marginBottom: '0.25rem' }}>
+                    <span>{slot.category.name}</span> {formatFullDate(slot.start_time)} – {formatFullDate(slot.end_time)}
+                    <br />
+                    {(() => {
                       if (!slot.user) {
                         return <button onClick={() => handleBook(slot.id)}>Zapisz się</button>;
                       }
@@ -137,8 +144,9 @@ function UserView() {
 
                       return <em>Zajęte</em>;
                     })()}
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>
@@ -146,5 +154,6 @@ function UserView() {
     </div>
   );
 }
+
 
 export default UserView;

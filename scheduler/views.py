@@ -8,8 +8,19 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from datetime import timedelta
 from .models import EventCategory, UserPreference, TimeSlot
-from .serializers import EventCategorySerializer, UserPreferenceSerializer, TimeSlotSerializer, TimeSlotBookingSerializer, TimeSlotCreateSerializer
+from .serializers import (EventCategorySerializer, 
+                          UserPreferenceSerializer, 
+                          TimeSlotSerializer, 
+                          TimeSlotBookingSerializer, 
+                          TimeSlotCreateSerializer,
+                          UserSerializer,
+                          )
 
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAdminUser]
 
 class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]

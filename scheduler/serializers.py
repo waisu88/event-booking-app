@@ -4,7 +4,12 @@ from .models import (
     UserPreference,
     TimeSlot,
     )
+from django.contrib.auth.models import User
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username']
 
 
 class EventCategorySerializer(serializers.ModelSerializer):
@@ -35,7 +40,7 @@ class UserPreferenceSerializer(serializers.ModelSerializer):
     
 
 class TimeSlotSerializer(serializers.ModelSerializer):
-    category = serializers.StringRelatedField()
+    category = EventCategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(queryset=EventCategory.objects.all(), source='category')
     user = serializers.StringRelatedField(read_only=True)
 
@@ -61,16 +66,25 @@ class TimeSlotBookingSerializer(serializers.ModelSerializer):
 
 
 class TimeSlotCreateSerializer(serializers.ModelSerializer):
-    category = serializers.StringRelatedField()
+    category = EventCategorySerializer(read_only=True)
     category_id = serializers.PrimaryKeyRelatedField(queryset=EventCategory.objects.all(), source='category')
-    user = serializers.StringRelatedField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), required=False)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        source='user',
+        allow_null=True,
+        required=False
+    )
 
     class Meta:
         model = TimeSlot
-        fields = ['id', 'category', 'category_id', 'start_time', 'end_time', 'user']
+        fields = ['id', 'category', 'category_id', 'start_time', 'end_time', 'user', 'user_id']
 
     def validate(self, data):
-        if data['start_time'] >= data['end_time']:
+        start_time = data.get('start_time', getattr(self.instance, 'start_time', None))
+        end_time = data.get('end_time', getattr(self.instance, 'end_time', None))
+
+        if start_time and end_time and start_time >= end_time:
             raise serializers.ValidationError("Start time must be before end time")
         return data
     

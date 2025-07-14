@@ -1,44 +1,36 @@
-import React, { useState, useEffect } from 'react';
+// Preferences.js
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Preferences.css';
 
-function Preferences() {
+function Preferences({ selectedIds, setSelectedIds }) {
   const [categories, setCategories] = useState([]);
-  const [selectedIds, setSelectedIds] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/categories/')
+    axios.get('/api/categories/')
       .then(res => setCategories(res.data))
       .catch(err => console.error(err));
 
-    axios.get('http://127.0.0.1:8000/api/preferences/')
+    axios.get('/api/preferences/')
       .then(res => {
         const ids = res.data.categories.map(cat => cat.id);
-        setSelectedIds(ids);
+        setSelectedIds(ids); // Ustawiamy globalnie
         setLoading(false);
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [setSelectedIds]);
 
   const toggleCategory = (id) => {
-    let newSelected;
-    if (selectedIds.includes(id)) {
-      // Usuwamy kategorię z wybranych
-      newSelected = selectedIds.filter(i => i !== id);
-    } else {
-      // Dodajemy kategorię do wybranych
-      newSelected = [...selectedIds, id];
-    }
+    const newSelected = selectedIds.includes(id)
+      ? selectedIds.filter(i => i !== id)
+      : [...selectedIds, id];
 
-    // Aktualizujemy lokalny stan
     setSelectedIds(newSelected);
 
-    // Od razu wysyłamy PATCH do backendu
-    axios.patch('http://127.0.0.1:8000/api/preferences/', {
+    axios.patch('/api/preferences/', {
       categories_ids: newSelected
     }).then(() => {
-      // Opcjonalnie możesz dać info, np. alert lub toast
       console.log('Zapisano preferencje!');
     }).catch(err => {
       alert('Błąd zapisu preferencji.');
@@ -46,18 +38,18 @@ function Preferences() {
     });
   };
 
-  if (loading) return <p>Ładowanie...</p>;
+  if (loading) return <p>Ładowanie preferencji...</p>;
 
   return (
     <div className="preferences-container section">
       <h2>Twoje preferencje wydarzeń</h2>
       <ul className="preferences-list">
         {categories.map(cat => (
-          <li 
-            key={cat.id} 
+          <li
+            key={cat.id}
             className={`preference-item ${selectedIds.includes(cat.id) ? 'selected' : ''}`}
             onClick={() => toggleCategory(cat.id)}
-            style={{cursor: 'pointer', userSelect: 'none', padding: '0.5rem'}}
+            style={{ cursor: 'pointer', userSelect: 'none', padding: '0.5rem' }}
           >
             {cat.name}
           </li>
