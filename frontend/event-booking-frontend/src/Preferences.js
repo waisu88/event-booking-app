@@ -63,7 +63,6 @@ function Preferences() {
           </li>
         ))}
       </ul>
-      {/* Usuwamy przycisk "Zapisz" */}
     </div>
   );
 }

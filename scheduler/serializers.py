@@ -47,7 +47,7 @@ class TimeSlotSerializer(serializers.ModelSerializer):
 class TimeSlotBookingSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeSlot
-        fields = []
+        fields = ['id', 'category', 'category_id', 'start_time', 'end_time', 'user']
 
     def update(self, instance, validated_data):
         user = self.context['request'].user

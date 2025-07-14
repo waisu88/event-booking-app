@@ -49,41 +49,21 @@ class UserPreferenceDetailView(generics.RetrieveUpdateAPIView):
         return obj
 
 
-# class TimeSlotListView(generics.ListAPIView):
-#     serializer_class = TimeSlotSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-
-#     def get_queryset(self):
-#         user = self.request.user
-#         qs = TimeSlot.objects.all()
-
-#         if hasattr(user, 'preference'):
-#             categories = user.preference.categories.all()
-#             qs = qs.filter(category__in=categories)
-        
-#         week = self.request.query_params.get('week')
-#         if week:
-#             from datetime import datetime, timedelta
-#             from django.utils.dateparse import parse_date
-
-#             try: 
-#                 dt = datetime.strptime(week + '-1', "%Y-W%W-%w")
-#                 end = dt + timedelta(days=7)
-#                 qs = qs.filter(start_time__gte=dt, start_time__lte=end)
-#             except:
-#                 pass
-        
-#         category_id = self.request.query_params.get('category')
-#         if category_id:
-#             qs = qs.filter(category_id=category_id)
-
-#         return qs.order_by('start_time')
-
-
-class TimeSlotBookView(generics.UpdateAPIView):
-    queryset = TimeSlot.objects.all()
-    serializer_class = TimeSlotBookingSerializer
+class TimeSlotBookView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            slot = TimeSlot.objects.get(pk=pk)
+        except TimeSlot.DoesNotExist:
+            return Response({"detail": "Slot not found."}, status=404)
+
+        if slot.user is not None:
+            return Response({"detail": "Slot already taken."}, status=400)
+
+        slot.user = request.user
+        slot.save()
+        return Response({"detail": "Successfully booked."}, status=200)
 
 
 class TimeSlotUnsubscribeView(APIView):
@@ -95,7 +75,7 @@ class TimeSlotUnsubscribeView(APIView):
         except TimeSlot.DoesNotExist:
             return Response({"detail": "Slot not found."}, status=404)
         
-        if slot.uset != request.user:
+        if slot.user != request.user:
             return Response({"detail": "You are not subscribed to this slot."}, status=403)
 
         slot.user = None
@@ -114,7 +94,7 @@ class TimeSlotViewSet(viewsets.ModelViewSet):
     filterset_fields = ['category']
 
     def get_serializer_class(self):
-        if self.action in ['create', 'update', 'partal_update']:
+        if self.action in ['create', 'update', 'partial_update']:
             return TimeSlotCreateSerializer
         return TimeSlotSerializer
 

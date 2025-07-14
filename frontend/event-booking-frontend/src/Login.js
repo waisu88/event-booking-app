@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'; // popraw import
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -17,7 +18,13 @@ function Login({ onLogin }) {
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
       axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
-      onLogin();
+
+      const decoded = jwtDecode(access);
+      const isAdmin = !!decoded.is_staff;
+
+      // Przekaż od razu info do App
+      onLogin({ isLoggedIn: true, isAdmin });
+
     } catch (err) {
       alert('Logowanie nieudane');
     }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode'; // Upewnij się, że masz zainstalowane: npm install jwt-decode
+import Preferences from './Preferences';
+
 
 function getStartOfWeek(weekOffset = 0) {
   const now = new Date();
@@ -38,12 +40,15 @@ function UserView() {
   const [weekOffset, setWeekOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [username, setUsername] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('access_token');
     if (token) {
       const decoded = jwtDecode(token);
       setUserId(decoded.user_id || decoded.sub);
+      setUsername(decoded.username || decoded.name);
+      console.log(decoded);
     }
   }, []);
 
@@ -52,6 +57,7 @@ function UserView() {
       .then(res => setCategories(res.data))
       .catch(console.error);
   }, []);
+  
 
   useEffect(() => {
     fetchSlots();
@@ -86,11 +92,12 @@ function UserView() {
   };
 
   if (loading) return <p>Ładowanie slotów...</p>;
-
+  
   const groupedDays = groupSlotsByDay(slots, weekOffset);
 
   return (
     <div>
+      <Preferences categories={categories} />
       <h2>Twój kalendarz slotów</h2>
 
       <label>
@@ -117,12 +124,19 @@ function UserView() {
                 <li key={slot.id}>
                   <strong>{slot.category.name}</strong> | {new Date(slot.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} – {new Date(slot.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                   <br />
-                  {slot.user === null
-                    ? <button onClick={() => handleBook(slot.id)}>Zapisz się</button>
-                    : slot.user === userId
-                      ? <button onClick={() => handleUnsubscribe(slot.id)}>Wypisz się</button>
-                      : <em>Zajęte</em>
-                  }
+                  {(() => {
+                      console.log("Slot user:", slot.user, "| Current username:", username);
+
+                      if (!slot.user) {
+                        return <button onClick={() => handleBook(slot.id)}>Zapisz się</button>;
+                      }
+
+                      if (slot.user === username) {
+                        return <button onClick={() => handleUnsubscribe(slot.id)}>Wypisz się</button>;
+                      }
+
+                      return <em>Zajęte</em>;
+                    })()}
                 </li>
               ))}
             </ul>

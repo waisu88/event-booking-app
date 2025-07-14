@@ -58,7 +58,7 @@ function AdminSlots({ isAdmin }) {
     }
 
     const data = {
-      category: form.category,
+      category_id: form.category,
       start_time: form.start_time,
       end_time: form.end_time,
     };
