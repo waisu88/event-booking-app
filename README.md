@@ -39,6 +39,17 @@ Admins can:
 
 ---
 
+## Future Development Ideas 
+
+- Add event descriptions visible in the calendar view to provide more context to users.
+- Allow customization of the UI color scheme, e.g., implementing a dark mode.
+- Implement validation to prevent users from booking slots that have already passed.
+- Migrate to an external database like PostgreSQL for better scalability and performance in production environments.
+- Enhance user profiles by requiring email at registration and integrating asynchronous email notifications (reminders) for upcoming booked slots using Celery with RabbitMQ or Redis.
+- Containerize the application using Docker and deploy it to a cloud platform for easier scaling and management.
+
+---
+
 ## How to Run (Windows 10, CMD)
 
 1. Clone the repository:
@@ -61,7 +72,7 @@ Admins can:
 
 5. Load initial data:
 
-    python manage.py loaddata initial_data.json
+    python manage.py loaddata backend/fixtures/initial_data.json
 
     OR
 6. (Optional) Create admin user:
@@ -75,3 +86,9 @@ Admins can:
 8. Open a browser and go to:
 
     http://127.0.0.1:8000/
+
+9. Neccessary access data (from initial_data.json):
+
+    Admin -> password: superhardpass
+    Testuser1 -> password: testpass1234
+    Testuser2 -> password: testpass1234
