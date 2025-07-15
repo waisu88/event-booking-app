@@ -9,7 +9,6 @@ from .views import (
     TimeSlotUnsubscribeView,
     TimeSlotViewSet,
     UserViewSet,
-    index
 )
 
 
@@ -25,6 +24,5 @@ urlpatterns = [
     path('slots/<int:pk>/unsubscribe/', TimeSlotUnsubscribeView.as_view(), name='timeslot_unsubscribe'),
 
     path('', include(router.urls)),
-
-    re_path(r'^(?:.*)/?$', TemplateView.as_view(template_name='index.html'))
 ]
+

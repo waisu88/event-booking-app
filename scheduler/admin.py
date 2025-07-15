@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import EventCategory, TimeSlot
+from .models import EventCategory, TimeSlot, UserPreference
 
 
-admin.site.register((EventCategory, TimeSlot, ))
+admin.site.register((EventCategory, TimeSlot, UserPreference))

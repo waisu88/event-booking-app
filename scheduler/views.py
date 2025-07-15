@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from rest_framework import generics, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,10 +14,6 @@ from .serializers import (EventCategorySerializer,
                           TimeSlotCreateSerializer,
                           UserSerializer,
                           )
-
-
-def index(request):
-    return render(request, 'index.html')
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -137,3 +132,5 @@ from .serializers import CustomTokenObtainPairSerializer
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+
+    
