@@ -1,0 +1,181 @@
+[
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$xSkZNv4VfLWEBU8CZ2ghJ4$4zmoH5KWvwuD+MeT6rCUi1v4xYSsee4uowObzaxibVA=",
+    "last_login": "2025-07-12T18:51:40.579Z",
+    "is_superuser": true,
+    "username": "Admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-07-12T18:51:33.258Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$tczpPZ9NYBczpsI9QgrBvV$RygQpBUIuSFLdc0QMZGQR3XDCug9OcJBj+wEkIHXkcU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Testuser1",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-07-12T18:52:09.211Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "fields": {
+    "password": "pbkdf2_sha256$720000$aGVQie1bmkxuRB7loR8Z4P$Su9ReLFpPUoFoCoQt7kIsdLK+OLYgMl+/36ONdF7cqM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Testuser2",
+    "first_name": "",
+    "last_name": "",
+    "email": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-07-13T11:18:51.511Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "scheduler.eventcategory",
+  "pk": 1,
+  "fields": {
+    "name": "Cat 1",
+    "description": "Description of category 1 event"
+  }
+},
+{
+  "model": "scheduler.eventcategory",
+  "pk": 2,
+  "fields": {
+    "name": "Cat 2",
+    "description": "Description of category 2 event"
+  }
+},
+{
+  "model": "scheduler.eventcategory",
+  "pk": 3,
+  "fields": {
+    "name": "Cat 3",
+    "description": "Description of category 3 event"
+  }
+},
+{
+  "model": "scheduler.eventcategory",
+  "pk": 4,
+  "fields": {
+    "name": "Cat 4",
+    "description": "Category 4 event"
+  }
+},
+{
+  "model": "scheduler.timeslot",
+  "pk": 2,
+  "fields": {
+    "category": 3,
+    "start_time": "2025-07-18T18:00:00Z",
+    "end_time": "2025-07-24T00:00:00Z",
+    "user": null
+  }
+},
+{
+  "model": "scheduler.timeslot",
+  "pk": 4,
+  "fields": {
+    "category": 1,
+    "start_time": "2025-07-14T22:08:00Z",
+    "end_time": "2025-07-15T00:14:00Z",
+    "user": [
+      "Testuser1"
+    ]
+  }
+},
+{
+  "model": "scheduler.timeslot",
+  "pk": 5,
+  "fields": {
+    "category": 3,
+    "start_time": "2025-07-15T21:20:00Z",
+    "end_time": "2025-07-15T22:20:00Z",
+    "user": [
+      "Testuser1"
+    ]
+  }
+},
+{
+  "model": "scheduler.timeslot",
+  "pk": 6,
+  "fields": {
+    "category": 4,
+    "start_time": "2025-07-16T20:19:00Z",
+    "end_time": "2025-07-16T20:50:00Z",
+    "user": null
+  }
+},
+{
+  "model": "scheduler.timeslot",
+  "pk": 7,
+  "fields": {
+    "category": 2,
+    "start_time": "2025-07-14T23:02:00Z",
+    "end_time": "2025-07-15T20:59:00Z",
+    "user": [
+      "Testuser2"
+    ]
+  }
+},
+{
+  "model": "scheduler.userpreference",
+  "pk": 1,
+  "fields": {
+    "user": [
+      "Testuser1"
+    ],
+    "categories": [
+      1,
+      3
+    ]
+  }
+},
+{
+  "model": "scheduler.userpreference",
+  "pk": 2,
+  "fields": {
+    "user": [
+      "Testuser2"
+    ],
+    "categories": [
+      1,
+      2
+    ]
+  }
+},
+{
+  "model": "scheduler.userpreference",
+  "pk": 3,
+  "fields": {
+    "user": [
+      "Admin"
+    ],
+    "categories": [
+      1,
+      2,
+      3
+    ]
+  }
+}
+]

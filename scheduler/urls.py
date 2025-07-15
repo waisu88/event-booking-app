@@ -1,5 +1,6 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework.routers import DefaultRouter
+from django.views.generic import TemplateView
 from .views import (
     EventCategoryListView, 
     UserPreferenceDetailView,
@@ -7,7 +8,8 @@ from .views import (
     TimeSlotBookView,
     TimeSlotUnsubscribeView,
     TimeSlotViewSet,
-    UserViewSet
+    UserViewSet,
+    index
 )
 
 
@@ -23,4 +25,6 @@ urlpatterns = [
     path('slots/<int:pk>/unsubscribe/', TimeSlotUnsubscribeView.as_view(), name='timeslot_unsubscribe'),
 
     path('', include(router.urls)),
+
+    re_path(r'^(?:.*)/?$', TemplateView.as_view(template_name='index.html'))
 ]

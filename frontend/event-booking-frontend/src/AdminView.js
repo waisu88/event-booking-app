@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { groupSlotsByDay, formatFullDate } from './helpers';
 
-function AdminSlots({ isAdmin }) {
+function AdminView({ isAdmin }) {
   const [slots, setSlots] = useState([]);
   const [categories, setCategories] = useState([]);
   const [users, setUsers] = useState([]);
@@ -15,9 +15,7 @@ function AdminSlots({ isAdmin }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [weekOffset, setWeekOffset] = useState(0);
-
-  // Nowy stan: wybrani użytkownicy per slot
-  const [selectedUsers, setSelectedUsers] = useState({}); // { slotId: userId }
+  const [selectedUsers, setSelectedUsers] = useState({});
 
   useEffect(() => {
     if (!isAdmin) return;
@@ -32,7 +30,6 @@ function AdminSlots({ isAdmin }) {
   }, [weekOffset]);
 
   const formRef = useRef(null);
-  const scrollPositionRef = useRef(0);
 
   const fetchSlots = () => {
     setLoading(true);
@@ -42,24 +39,15 @@ function AdminSlots({ isAdmin }) {
         setSlots(res.data);
         setLoading(false);
       })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   };
 
   const fetchCategories = () => {
-    axios
-      .get('/api/categories/')
-      .then(res => setCategories(res.data))
-      .catch(err => console.error(err));
+    axios.get('/api/categories/').then(res => setCategories(res.data));
   };
 
   const fetchUsers = () => {
-    axios
-      .get('/api/users/')
-      .then(res => setUsers(res.data))
-      .catch(err => console.error(err));
+    axios.get('/api/users/').then(res => setUsers(res.data));
   };
 
   const handleChange = e => {
@@ -77,7 +65,7 @@ function AdminSlots({ isAdmin }) {
     setError('');
 
     if (!form.category || !form.start_time || !form.end_time) {
-      setError('Wypełnij wszystkie pola.');
+      setError('Please fill out all fields.');
       return;
     }
 
@@ -94,7 +82,7 @@ function AdminSlots({ isAdmin }) {
           fetchSlots();
           resetForm();
         })
-        .catch(() => setError('Błąd przy aktualizacji slotu.'));
+        .catch(() => setError('Error updating slot.'));
     } else {
       axios
         .post('/api/slots/', data)
@@ -102,7 +90,7 @@ function AdminSlots({ isAdmin }) {
           fetchSlots();
           resetForm();
         })
-        .catch(() => setError('Błąd przy tworzeniu slotu.'));
+        .catch(() => setError('Error creating slot.'));
     }
   };
 
@@ -114,126 +102,101 @@ function AdminSlots({ isAdmin }) {
       end_time: slot.end_time.slice(0, 16),
     });
     setError('');
-
     formRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleDelete = id => {
-    if (!window.confirm('Na pewno usunąć ten slot?')) return;
-
-    axios
-      .delete(`/api/slots/${id}/`)
-      .then(() => fetchSlots())
-      .catch(() => setError('Błąd przy usuwaniu slotu.'));
+    if (!window.confirm('Are you sure you want to delete this slot?')) return;
+    axios.delete(`/api/slots/${id}/`).then(fetchSlots).catch(() => setError('Error deleting slot.'));
   };
 
-  // Aktualizacja wybranego usera dla konkretnego slotu w stanie
   const handleUserSelectChange = (slotId, userId) => {
     setSelectedUsers(prev => ({ ...prev, [slotId]: userId }));
   };
 
   const handleAssignUser = (slotId) => {
     const userId = selectedUsers[slotId];
-    console.log('Próbuję przypisać użytkownika', userId, 'do slotu', slotId);
 
     if (!userId) {
-      setError('Wybierz użytkownika do przypisania.');
+      setError('Select a user to assign.');
       return;
     }
+
     axios
-      .patch(`/api/slots/${slotId}/`, { user_id: userId }) // backend musi obsługiwać user_id
+      .patch(`/api/slots/${slotId}/`, { user_id: userId })
       .then(() => {
         fetchSlots();
         setSelectedUsers(prev => ({ ...prev, [slotId]: '' }));
         setError('');
       })
-      .catch(() => setError('Błąd przy przypisywaniu użytkownika.'));
+      .catch(() => setError('Error assigning user.'));
   };
 
   const handleUnassignUser = slotId => {
     axios
       .patch(`/api/slots/${slotId}/`, { user_id: null })
-      .then(() => fetchSlots())
-      .catch(() => setError('Błąd przy wypisywaniu użytkownika.'));
+      .then(fetchSlots)
+      .catch(() => setError('Error unassigning user.'));
   };
 
-  if (!isAdmin) return <p>Brak dostępu do panelu administratora.</p>;
-  if (loading) return <p>Ładowanie...</p>;
+  if (!isAdmin) return <p>Access denied.</p>;
+  if (loading) return <p>Loading...</p>;
 
   return (
     <div className="section">
-      <h2>Panel administratora - zarządzanie slotami</h2>
-
+      <h2>Admin Panel - Slot Management</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
       <form onSubmit={handleSubmit} ref={formRef} style={{ marginBottom: '2rem' }}>
-
         <label>
-          Kategoria:
+          Category:
           <select name="category" value={form.category} onChange={handleChange}>
-            <option value="">-- wybierz --</option>
+            <option value="">-- select --</option>
             {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
+              <option key={cat.id} value={cat.id}>{cat.name}</option>
             ))}
           </select>
         </label>
 
         <label>
           Start:
-          <input
-            type="datetime-local"
-            name="start_time"
-            value={form.start_time}
-            onChange={handleChange}
-          />
+          <input type="datetime-local" name="start_time" value={form.start_time} onChange={handleChange} />
         </label>
 
         <label>
-          Koniec:
-          <input
-            type="datetime-local"
-            name="end_time"
-            value={form.end_time}
-            onChange={handleChange}
-          />
+          End:
+          <input type="datetime-local" name="end_time" value={form.end_time} onChange={handleChange} />
         </label>
 
         <button type="submit" className="primary">
-          {form.id ? 'Zapisz zmiany' : 'Dodaj slot'}
+          {form.id ? 'Save changes' : 'Add slot'}
         </button>
         {form.id && (
           <button type="button" onClick={resetForm} className="cancel" style={{ marginLeft: '1rem' }}>
-            Anuluj
+            Cancel
           </button>
         )}
       </form>
 
-      <h3>Kalendarz slotów</h3>
+      <h3>Slot Calendar</h3>
 
       <div style={{ margin: '1rem 0' }}>
-        <button onClick={() => setWeekOffset(weekOffset - 1)}>← Poprzedni tydzień</button>
-        <button onClick={() => setWeekOffset(weekOffset + 1)}>Następny tydzień →</button>
+        <button onClick={() => setWeekOffset(weekOffset - 1)}>← Previous week</button>
+        <button onClick={() => setWeekOffset(weekOffset + 1)}>Next week →</button>
       </div>
 
       {groupSlotsByDay(slots, weekOffset).map(day => (
         <div
           key={day.date.toISOString()}
-          style={{
-            marginBottom: '1rem',
-            border: '1px solid #ccc',
-            padding: '0.5rem',
-            borderRadius: '8px',
-          }}
+          style={{ marginBottom: '1rem', border: '1px solid #ccc', padding: '0.5rem', borderRadius: '8px' }}
         >
-          <h3>{day.date.toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
+          <h3>{day.date.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
           {day.slots.length === 0 ? (
-            <p>Brak slotów</p>
+            <p>No slots</p>
           ) : (
             <ul>
               {day.slots.map(slot => {
-                const backgroundColor = slot.user ? '#4D8A4F' : ''; // Zielony jeśli zajęty
+                const backgroundColor = slot.user ? '#4D8A4F' : '';
                 return (
                   <li
                     key={slot.id}
@@ -245,17 +208,14 @@ function AdminSlots({ isAdmin }) {
                       color: slot.user ? 'white' : 'inherit',
                     }}
                   >
-                    <strong>{slot.category.name}</strong>: {formatFullDate(slot.start_time)} –{' '}
-                    {formatFullDate(slot.end_time)}
+                    <strong>{slot.category.name}</strong> {formatFullDate(slot.start_time)} – {formatFullDate(slot.end_time)}
                     <br />
                     {slot.user ? (
                       <>
-                        <p>
-                          <em>Użytkownik: {slot.user}</em>
-                        </p>
+                        <p><em>User: {slot.user}</em></p>
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button type="button" onClick={() => handleUnassignUser(slot.id)}>Wypisz</button>
-                          <button type="button" onClick={() => handleEdit(slot)}>Edytuj</button>
+                          <button type="button" onClick={() => handleUnassignUser(slot.id)}>Unassign</button>
+                          <button type="button" onClick={() => handleEdit(slot)}>Edit</button>
                         </div>
                       </>
                     ) : (
@@ -264,22 +224,16 @@ function AdminSlots({ isAdmin }) {
                           value={selectedUsers[slot.id] || ''}
                           onChange={e => handleUserSelectChange(slot.id, e.target.value)}
                         >
-                          <option value="">-- wybierz użytkownika --</option>
+                          <option value="">-- select user --</option>
                           {users.map(user => (
-                            <option key={user.id} value={user.id}>
-                              {user.username}
-                            </option>
+                            <option key={user.id} value={user.id}>{user.username}</option>
                           ))}
                         </select>
                         <div style={{ display: 'inline-flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-                          <button 
-                            type="button"
-                            onClick={() => handleAssignUser(slot.id)}
-                            disabled={!selectedUsers[slot.id]}
-                          >
-                            Przypisz
+                          <button type="button" onClick={() => handleAssignUser(slot.id)} disabled={!selectedUsers[slot.id]}>
+                            Assign
                           </button>
-                          <button type="button" onClick={() => handleEdit(slot)}>Edytuj</button>
+                          <button type="button" onClick={() => handleEdit(slot)}>Edit</button>
                         </div>
                       </>
                     )}
@@ -294,4 +248,4 @@ function AdminSlots({ isAdmin }) {
   );
 }
 
-export default AdminSlots;
+export default AdminView;

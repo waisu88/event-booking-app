@@ -1,4 +1,5 @@
-from rest_framework import generics, viewsets, permissions, status
+from django.shortcuts import render
+from rest_framework import generics, viewsets, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
@@ -11,10 +12,13 @@ from .models import EventCategory, UserPreference, TimeSlot
 from .serializers import (EventCategorySerializer, 
                           UserPreferenceSerializer, 
                           TimeSlotSerializer, 
-                          TimeSlotBookingSerializer, 
                           TimeSlotCreateSerializer,
                           UserSerializer,
                           )
+
+
+def index(request):
+    return render(request, 'index.html')
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
@@ -93,11 +97,6 @@ class TimeSlotUnsubscribeView(APIView):
         slot.save()
         return Response({"detail": "Unsubscribed."}, status=200)
     
-# class TimeSlotCreateView(generics.CreateAPIView):
-#     queryset = TimeSlot.objects.all()
-#     serializer_class = TimeSlotCreateSerializer
-#     permission_classes = [permissions.IsAdminUser]
-
 
 class TimeSlotViewSet(viewsets.ModelViewSet):
     queryset = TimeSlot.objects.all()

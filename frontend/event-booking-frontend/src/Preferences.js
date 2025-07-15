@@ -1,4 +1,3 @@
-// Preferences.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './Preferences.css';
@@ -38,11 +37,11 @@ function Preferences({ selectedIds, setSelectedIds }) {
     });
   };
 
-  if (loading) return <p>Ładowanie preferencji...</p>;
+  if (loading) return <p>Loading preferences...</p>;
 
   return (
     <div className="preferences-container section">
-      <h2>Twoje preferencje wydarzeń</h2>
+      <h2>Your Event Prefrences</h2>
       <ul className="preferences-list">
         {categories.map(cat => (
           <li

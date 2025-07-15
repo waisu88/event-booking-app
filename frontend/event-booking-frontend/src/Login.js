@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode'; // popraw import
+import { jwtDecode } from 'jwt-decode';
+import './Login.css';
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -10,7 +11,7 @@ function Login({ onLogin }) {
   const handleLogin = async e => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://127.0.0.1:8000/api/token/', {
+      const res = await axios.post('/api/token/', {
         username,
         password,
       });
@@ -22,67 +23,62 @@ function Login({ onLogin }) {
       const decoded = jwtDecode(access);
       const isAdmin = !!decoded.is_staff;
 
-      // Przekaż od razu info do App
       onLogin({ isLoggedIn: true, isAdmin });
-
     } catch (err) {
-      alert('Logowanie nieudane');
+      alert('Login failed');
     }
   };
 
   const handleRegister = async e => {
     e.preventDefault();
     try {
-      await axios.post('http://127.0.0.1:8000/api/register/', {
+      await axios.post('/api/register/', {
         username,
         password,
       });
-      alert('Rejestracja zakończona sukcesem! Zaloguj się.');
+      alert('Registration successful! You can now log in.');
       setIsRegistering(false);
     } catch (err) {
-      alert('Błąd rejestracji');
+      alert('Registration error');
     }
   };
 
   return (
-    <div>
-      {isRegistering ? (
-        <form onSubmit={handleRegister}>
-          <h2>Rejestracja</h2>
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="login-title">{isRegistering ? 'Register' : 'Login'}</h2>
+        <form onSubmit={isRegistering ? handleRegister : handleLogin}>
+          <label className="login-label">Username</label>
           <input
             type="text"
-            placeholder="Nazwa użytkownika"
             value={username}
             onChange={e => setUsername(e.target.value)}
-          /><br />
+            className="login-input"
+            required
+          />
+
+          <label className="login-label">Password</label>
           <input
             type="password"
-            placeholder="Hasło"
             value={password}
             onChange={e => setPassword(e.target.value)}
-          /><br />
-          <button type="submit">Zarejestruj</button> &nbsp;
-          <button type="button" onClick={() => setIsRegistering(false)}>Masz już konto?</button>
+            className="login-input"
+            required
+          />
+
+          <button type="submit" className="login-button">
+            {isRegistering ? 'Register' : 'Login'}
+          </button>
+
+          <button
+            type="button"
+            className="login-link-button"
+            onClick={() => setIsRegistering(!isRegistering)}
+          >
+            {isRegistering ? 'Already have an account? Log in' : "Don't have an account? Register"}
+          </button>
         </form>
-      ) : (
-        <form onSubmit={handleLogin}>
-          <h2>Logowanie</h2>
-          <input
-            type="text"
-            placeholder="Nazwa użytkownika"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-          /><br />
-          <input
-            type="password"
-            placeholder="Hasło"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          /><br />
-          <button type="submit">Zaloguj</button> &nbsp;
-          <button type="button" onClick={() => setIsRegistering(true)}>Nie masz konta?</button>
-        </form>
-      )}
+      </div>
     </div>
   );
 }
